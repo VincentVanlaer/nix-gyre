@@ -1,0 +1,22 @@
+diff --git a/src/common/constants_m.fypp b/src/common/constants_m.fypp
+index be943da5..f02e6212 100644
+--- a/src/common/constants_m.fypp
++++ b/src/common/constants_m.fypp
+@@ -57,7 +57,7 @@ module constants_m
+
+    ! Paths
+
+-   character(FILENAME_LEN), save, protected :: GYRE_DIR = ''
++   character(FILENAME_LEN), save, protected :: GYRE_DIR = 'NIX_GYRE_DIR'
+
+    ! Interfaces
+
+@@ -117,9 +117,6 @@ contains
+
+       ! Read constants
+
+-      call get_env('GYRE_DIR', gyre_dir_, status)
+-      if (status == 0) GYRE_DIR = gyre_dir_
+-
+       rewind(unit)
+       read(unit, NML=constants)
