@@ -1,5 +1,8 @@
-{ lib, fetchFromGitHub, buildPythonPackage }:
-
+{
+  lib,
+  fetchFromGitHub,
+  buildPythonPackage,
+}:
 buildPythonPackage rec {
   pname = "fypp";
   version = "3.2";
@@ -15,6 +18,6 @@ buildPythonPackage rec {
     description = "Python powered Fortran preprocessor";
     homepage = "https://github.com/aradi/fypp";
     license = licenses.gpl3Only;
-    maintainers = [ maintainers.sheepforce ];
+    maintainers = [maintainers.sheepforce];
   };
 }
