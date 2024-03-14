@@ -1,4 +1,4 @@
-with import <nixpkgs> {}; {
+{ pkgs ? import <nixpkgs> {}}: with pkgs; {
   gyre = callPackage ./gyre.nix {
     lapack95 = callPackage ./lapack95.nix {};
     odepack = callPackage ./odepack.nix {};
