@@ -3,7 +3,7 @@ This repository contains all the necessary nix files and patches to run [GYRE](h
 To quickly build and get a shell with GYRE, run
 
 ```
-nix-shell -p '(import (fetchGit { url="https://github.com/VincentVanlaer/nix-gyre"; } )).gyre'
+nix-shell -p '(import (fetchGit { url="https://github.com/VincentVanlaer/nix-gyre"; } ) {}).gyre'
 ```
 
 This repository also contains build files for:
