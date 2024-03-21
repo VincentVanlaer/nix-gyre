@@ -22,7 +22,7 @@
 in
   stdenv.mkDerivation {
     pname = "gyre";
-    version = "7.1";
+    version = "7.1-next";
 
     src = fetchgit {
       url = "https://github.com/rhdtownsend/gyre";
