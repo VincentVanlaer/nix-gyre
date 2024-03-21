@@ -1,9 +1,9 @@
-This repository contains all the necessary nix files and patches to run [GYRE](https://github.com/rhtownsend/gyre) on nix-based systems. Currently, only the next-gen branch of GYRE is supported as the build system is easier to use.
+This repository contains all the necessary nix files and patches to run [GYRE](https://github.com/rhtownsend/gyre) on nix-based systems.
 
 To quickly build and get a shell with GYRE, run
 
 ```
-nix-shell -p '(import (fetchGit { url="https://github.com/VincentVanlaer/nix-gyre"; } ) {}).gyre'
+nix-shell -p '(import (fetchGit { url="https://github.com/VincentVanlaer/nix-gyre"; } ) {}).gyre-71'
 ```
 
 This repository also contains build files for:

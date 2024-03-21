@@ -3,16 +3,14 @@
   stdenv,
   fetchgit,
   gfortran,
-  python3,
   hdf5-fortran,
   lapack,
   lapack95,
-  odepack,
-  autoPatchelfHook,
+  fpx3,
+  fpx3_deps,
   pkg-config,
 }: let
-  python = python3.withPackages (p: [p.fypp]);
-  makeFilesToPatch = "src/tide/Makefile src/forum/build/Make.inc src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile build/Make.inc build/Makefile";
+  makeFilesToPatch = "src/tide/Makefile src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile src/build/Make.inc src/build/Makefile";
   linkProgsToPkgConfig = {
     "hdf5_link" = "pkg-config --libs hdf5_fortran";
     "lapack_link" = "pkg-config --libs lapack";
@@ -22,41 +20,33 @@
 in
   stdenv.mkDerivation {
     pname = "gyre";
-    version = "7.1-next";
+    version = "7.1";
 
     src = fetchgit {
       url = "https://github.com/rhdtownsend/gyre";
-      rev = "5cc145a0d2abcec7f7cb209a1cda44e6d92fefe2";
-      hash = "sha256-LzoW3hInUyjQheLxObg/nltVXvN5/iH8aRMj1PKcJjM=";
+      rev = "5c11e7316d993a568febf34011660dfdb6ae1054";
+      hash = "sha256-vvY43KBOTYd+iykVyd+7x0kZ+WwTTZoi3l1oWKKCcSM=";
     };
 
     patches = [./gyre.patch];
 
     CRMATH = "no";
-    FFLAGS = [" -I${hdf5-fortran.dev}/include" " -I${lapack95}/include" " -I${odepack}/include"];
+    FFLAGS = [" -I${hdf5-fortran.dev}/include" " -I${lapack95}/include"];
 
-    nativeBuildInputs = [autoPatchelfHook gfortran pkg-config];
-    buildInputs = [hdf5-fortran lapack lapack95 odepack];
+    nativeBuildInputs = [gfortran pkg-config fpx3 fpx3_deps];
+    buildInputs = [hdf5-fortran lapack lapack95];
 
     configurePhase = ''
+      sed 's/`lapack95_link`/`lapack95_link` `lapack_link`/' -i src/build/Make.inc
       ${(lib.strings.concatStringsSep "\n" (lib.attrsets.mapAttrsToList (name: value: "sed -i \"s|${name}|${value}|\" ${makeFilesToPatch}") linkProgsToPkgConfig))}
-      sed -i "s|#!/usr/bin/env python3|#!${python}/bin/python3|" src/forum/build/fypp_deps build/fypp_deps
-      sed -i "s|^sys.path.insert|#sys.path.insert|" src/forum/build/fypp_deps build/fypp_deps
-      echo "echo passed" > build/check_sdk_version
-      echo "echo passed" > src/forum/build/check_sdk_version
-      sed -i "s|NIX_GYRE_DIR|$out|" src/common/constants_m.fypp
+      echo "echo passed" > src/build/check_sdk_version
+      sed -i "s|NIX_GYRE_DIR|$out|" src/common/gyre_constants.fpp
     '';
 
     installPhase = ''
       mkdir -p $out/bin
-      mkdir -p $out/lib
 
       cp bin/* $out/bin
-      cp lib/*.so $out/lib
       cp -r data $out
-
-      for bin in $out/{bin,lib}/*; do
-        patchelf --remove-rpath $bin
-      done
     '';
   }
