@@ -12,8 +12,9 @@
   pkg-config,
 }: let
   python = python3.withPackages (p: [p.fypp]);
-  makeFilesToPatch = "src/tide/Makefile src/forum/build/Make.inc src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile build/Make.inc build/Makefile";
-  linkProgsToPkgConfig = {
+  helpers = (import ./helpers.nix { inherit lib; });
+  makeFiles = "src/tide/Makefile src/forum/build/Make.inc src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile build/Make.inc build/Makefile";
+  linkProgs = {
     "hdf5_link" = "pkg-config --libs hdf5_fortran";
     "lapack_link" = "pkg-config --libs lapack";
     "lapack95_link" = "pkg-config --libs lapack95";
@@ -39,7 +40,7 @@ in
     buildInputs = [hdf5-fortran lapack lapack95 odepack];
 
     configurePhase = ''
-      ${(lib.strings.concatStringsSep "\n" (lib.attrsets.mapAttrsToList (name: value: "sed -i \"s|${name}|${value}|\" ${makeFilesToPatch}") linkProgsToPkgConfig))}
+      ${helpers.patchLinkProgs makeFiles linkProgs}
       sed -i "s|#!/usr/bin/env python3|#!${python}/bin/python3|" src/forum/build/fypp_deps build/fypp_deps
       sed -i "s|^sys.path.insert|#sys.path.insert|" src/forum/build/fypp_deps build/fypp_deps
       echo "echo passed" > build/check_sdk_version

@@ -1,4 +1,8 @@
 {
+  version,
+  hash,
+}:
+{
   lib,
   stdenv,
   fetchgit,
@@ -10,22 +14,22 @@
   fpx3_deps,
   pkg-config,
 }: let
-  makeFilesToPatch = "src/tide/Makefile src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile src/build/Make.inc src/build/Makefile";
-  linkProgsToPkgConfig = {
+  helpers = (import ./helpers.nix { inherit lib; });
+  makeFiles = "src/tide/Makefile src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile src/build/Make.inc src/build/Makefile";
+  linkProgs = {
     "hdf5_link" = "pkg-config --libs hdf5_fortran";
-    "lapack_link" = "pkg-config --libs lapack";
-    "lapack95_link" = "pkg-config --libs lapack95";
+    "lapack95_link" = "pkg-config --libs lapack95 lapack";
     "odepack_link" = "pkg-config --libs odepack";
   };
 in
   stdenv.mkDerivation {
     pname = "gyre";
-    version = "7.1";
+    inherit version;
 
     src = fetchgit {
       url = "https://github.com/rhdtownsend/gyre";
-      rev = "5c11e7316d993a568febf34011660dfdb6ae1054";
-      hash = "sha256-vvY43KBOTYd+iykVyd+7x0kZ+WwTTZoi3l1oWKKCcSM=";
+      rev = "v${version}";
+      inherit hash;
     };
 
     patches = [./gyre.patch];
@@ -37,8 +41,7 @@ in
     buildInputs = [hdf5-fortran lapack lapack95];
 
     configurePhase = ''
-      sed 's/`lapack95_link`/`lapack95_link` `lapack_link`/' -i src/build/Make.inc
-      ${(lib.strings.concatStringsSep "\n" (lib.attrsets.mapAttrsToList (name: value: "sed -i \"s|${name}|${value}|\" ${makeFilesToPatch}") linkProgsToPkgConfig))}
+      ${helpers.patchLinkProgs makeFiles linkProgs}
       echo "echo passed" > src/build/check_sdk_version
       sed -i "s|NIX_GYRE_DIR|$out|" src/common/gyre_constants.fpp
     '';
