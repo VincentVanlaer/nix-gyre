@@ -2,18 +2,17 @@
   stdenvNoCC,
   perl,
 }:
- stdenvNoCC.mkDerivation {
-    version = "0";
-    name = "fpx3_deps";
+stdenvNoCC.mkDerivation {
+  version = "0";
+  name = "fpx3_deps";
 
-    src = ./fpx3_deps;
-    dontUnpack = true;
+  src = ./fpx3_deps;
+  dontUnpack = true;
 
-    buildInputs = [perl];
+  buildInputs = [perl];
 
-    installPhase = ''
-      mkdir -p $out/bin
-      cp $src $out/bin/fpx3_deps
-    '';
-  }
-
+  installPhase = ''
+    mkdir -p $out/bin
+    cp $src $out/bin/fpx3_deps
+  '';
+}

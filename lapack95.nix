@@ -33,10 +33,10 @@ in
       mkdir -p $out/lib
       mkdir -p $out/lib/pkgconfig
       mkdir -p $out/include
-      
+
       cp lapack95.* $out/lib
       cp lapack95_modules/* $out/include
-      
+
       cat <<EOF > $out/lib/pkgconfig/lapack95.pc
       Name: lapack95
       Version: ${version}

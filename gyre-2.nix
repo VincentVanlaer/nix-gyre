@@ -14,7 +14,7 @@
   withCrlibm ? true,
 }: let
   python = python3.withPackages (p: [p.fypp]);
-  helpers = (import ./helpers.nix { inherit lib; });
+  helpers = import ./helpers.nix {inherit lib;};
   makeFiles = "src/tide/Makefile src/forum/build/Make.inc src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile build/Make.inc build/Makefile";
   linkProgs = {
     "hdf5_link" = "pkg-config --libs hdf5_fortran";
