@@ -16,4 +16,4 @@ This repository also contains build files for:
 - lapack95 (FORTRAN95 wrapper for LAPACK)
 - odepack
 
-Note that the bit-for-bit reproducible mode with crlibm is not supported currently (it may also be necessary to check that we don't break that in other ways). Another problem is that HDF5 has a [bug](https://github.com/HDFGroup/hdf5/issues/3831) for which the [fix](https://github.com/HDFGroup/hdf5/pull/3837) has not yet been released, so we patch HDF5 here.
+Currently, HDF5 has a [bug](https://github.com/HDFGroup/hdf5/issues/3831) for which the [fix](https://github.com/HDFGroup/hdf5/pull/3837) has not yet been released, so we patch HDF5 here.
