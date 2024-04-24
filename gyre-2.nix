@@ -10,6 +10,8 @@
   odepack,
   autoPatchelfHook,
   pkg-config,
+  crlibm-fortran,
+  withCrlibm ? true,
 }: let
   python = python3.withPackages (p: [p.fypp]);
   helpers = (import ./helpers.nix { inherit lib; });
@@ -19,6 +21,8 @@
     "lapack_link" = "pkg-config --libs lapack";
     "lapack95_link" = "pkg-config --libs lapack95";
     "odepack_link" = "pkg-config --libs odepack";
+    "crlibm_link" = "pkg-config --libs crlibm-fortran";
+    "crmath_link" = "pkg-config --libs crlibm-fortran";
   };
 in
   stdenv.mkDerivation {
@@ -33,11 +37,18 @@ in
 
     patches = [./gyre-next.patch];
 
-    CRMATH = "no";
-    FFLAGS = [" -I${hdf5-fortran.dev}/include" " -I${lapack95}/include" " -I${odepack}/include"];
+    CRMATH =
+      if withCrlibm
+      then "yes"
+      else "no";
+    FFLAGS =
+      [" -I${hdf5-fortran.dev}/include" " -I${lapack95}/include" " -I${odepack}/include"]
+      ++ lib.optional withCrlibm " -I${crlibm-fortran}/include";
 
     nativeBuildInputs = [autoPatchelfHook gfortran pkg-config];
-    buildInputs = [hdf5-fortran lapack lapack95 odepack];
+    buildInputs =
+      [hdf5-fortran lapack lapack95 odepack]
+      ++ lib.optional withCrlibm crlibm-fortran;
 
     configurePhase = ''
       ${helpers.patchLinkProgs makeFiles linkProgs}

@@ -20,6 +20,8 @@
     "hdf5_link" = "pkg-config --libs hdf5_fortran";
     "lapack95_link" = "pkg-config --libs lapack95 lapack";
     "odepack_link" = "pkg-config --libs odepack";
+    "crlibm_link" = "pkg-config --libs crlibm-fortran";
+    "crmath_link" = "pkg-config --libs crlibm-fortran";
   };
 in
   stdenv.mkDerivation {
@@ -34,11 +36,16 @@ in
 
     patches = [./gyre.patch];
 
-    CRMATH = "no";
-    FFLAGS = [" -I${hdf5-fortran.dev}/include" " -I${lapack95}/include"];
+    CRMATH =
+      if withCrlibm
+      then "yes"
+      else "no";
+    FFLAGS = [" -I${hdf5-fortran.dev}/include" " -I${lapack95}/include"]
+      ++ lib.optional withCrlibm " -I${crlibm-fortran}/include";
 
     nativeBuildInputs = [gfortran pkg-config fpx3 fpx3_deps];
-    buildInputs = [hdf5-fortran lapack lapack95];
+    buildInputs = [hdf5-fortran lapack lapack95]
+      ++ lib.optional withCrlibm crlibm-fortran;
 
     configurePhase = ''
       ${helpers.patchLinkProgs makeFiles linkProgs}

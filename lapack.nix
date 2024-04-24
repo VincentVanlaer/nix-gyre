@@ -1,11 +1,18 @@
-
 {
+  lib,
   stdenv,
   fetchurl,
   gfortran,
   pkg-config,
+  withCrlibm ? true,
+  crlibm-fortran,
 }: let
   version = "3.0";
+  crlibm-patch = if withCrlibm then /* bash */ ''
+    ${./crmath_lapack}/fix_crmath_lapack.sh
+    export FFLAGS=`pkg-config --cflags crlibm-fortran`
+    export LDLIBS=`pkg-config --libs crlibm-fortran`
+  '' else ""; 
 in
   stdenv.mkDerivation {
     inherit version;
@@ -17,6 +24,7 @@ in
     };
     
     nativeBuildInputs = [gfortran pkg-config];
+    buildInputs = lib.optional withCrlibm crlibm-fortran;
 
     buildPhase = ''
       make blaslib
@@ -24,6 +32,7 @@ in
     '';
 
     configurePhase = ''
+      ${crlibm-patch}
       cp ${./lapack.make.inc} make.inc
     '';
 

@@ -20,13 +20,12 @@ CFLAGS = -O3 -fPIC
 #  should not compile LAPACK with flags such as -ffpe-trap=overflow.
 #
 FC = gfortran
-FFLAGS = -O2 -frecursive -fPIC
+FFLAGS_NOOPT = -O0 -frecursive -fPIC $(FFLAGS)
+FFLAGS += -O2 -frecursive -fPIC
 FFLAGS_DRV = $(FFLAGS)
-FFLAGS_NOOPT = -O0 -frecursive -fPIC
 
 #  Define LDFLAGS to the desired linker options for your machine.
 #
-LDFLAGS =
 
 #  The archiver and the flag(s) to use when building an archive
 #  (library).  If your system has no ranlib, set RANLIB = echo.

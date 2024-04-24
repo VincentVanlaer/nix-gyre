@@ -1,6 +1,7 @@
 {
   pkgs ? import <nixpkgs> {},
   lapack-netlib ? true,
+  crmath ? true,
 }: let
   callPackage = pkgs.callPackage;
   hdf5-fortran = pkgs.hdf5-fortran;
@@ -16,8 +17,10 @@
     gyre-60 = { version = "6.0.1"; hash = "sha256-UR5MDN8m2TiS7fd7a39OahLBpA2Fo9I/IkehmYbsRxc="; };
   };
 
-  lapack = if lapack-netlib then callPackage ./lapack.nix {} else pkgs.lapack;
-  lapack95 = callPackage ./lapack95.nix { lapack = lapack; };
+  crlibm = callPackage ./crlibm.nix {};
+  crlibm-fortran = callPackage ./crlibm-fortran.nix { inherit crlibm; };
+  lapack = if lapack-netlib then callPackage ./lapack.nix { inherit crlibm-fortran; withCrlibm = crmath; } else pkgs.lapack;
+  lapack95 = callPackage ./lapack95.nix { inherit lapack; };
   odepack = callPackage ./odepack.nix {};
   hdf5 = hdf5-fortran.overrideAttrs (finalAttrs: prevAttrs: {patches = (prevAttrs.patches or []) ++ [./hdf5.patch];});
   python3-with-fypp = python3.override {
@@ -27,7 +30,7 @@
   fpx3_deps = callPackage ./fpx3_deps.nix {};
 in {
   gyre-next = callPackage ./gyre-2.nix {
-    inherit lapack lapack95 odepack;
+    inherit lapack lapack95 odepack crlibm-fortran;
     hdf5-fortran = hdf5;
     python3 = python3-with-fypp;
   };
