@@ -1,4 +1,7 @@
 {
+  version,
+  hash,
+}: {
   lib,
   stdenv,
   fetchgit,
@@ -26,13 +29,13 @@
   };
 in
   stdenv.mkDerivation {
+    inherit version;
     pname = "gyre";
-    version = "7.1-next";
 
     src = fetchgit {
       url = "https://github.com/rhdtownsend/gyre";
-      rev = "5cc145a0d2abcec7f7cb209a1cda44e6d92fefe2";
-      hash = "sha256-LzoW3hInUyjQheLxObg/nltVXvN5/iH8aRMj1PKcJjM=";
+      rev = "v${version}";
+      inherit hash;
     };
 
     patches = [./gyre-next.patch];

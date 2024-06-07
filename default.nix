@@ -34,6 +34,12 @@
       hash = "sha256-UR5MDN8m2TiS7fd7a39OahLBpA2Fo9I/IkehmYbsRxc=";
     };
   };
+  gyre-2-versions = {
+    gyre-72 = {
+      version = "7.2";
+      hash = "sha256-k0DWLJiILaQ6ue5ny9uQCXGm4pUXb667Pa8LIK7Y4HU=";
+    };
+  };
 
   crlibm = callPackage ./crlibm.nix {};
   crlibm-fortran = callPackage ./crlibm-fortran.nix {inherit crlibm;};
@@ -54,14 +60,14 @@
   fpx3 = callPackage ./fpx3.nix {};
   fpx3_deps = callPackage ./fpx3_deps.nix {};
 in
-  {
-    gyre-next = callPackage ./gyre-2.nix {
+  builtins.mapAttrs (name: g:
+    callPackage (import ./gyre-2.nix g) {
       inherit lapack lapack95 odepack crlibm-fortran;
       hdf5-fortran = hdf5;
       python3 = python3-with-fypp;
       withCrlibm = crmath;
-    };
-  }
+    })
+  gyre-2-versions
   // builtins.mapAttrs (name: g:
     callPackage (import ./gyre-1.nix g) {
       inherit lapack lapack95 fpx3 fpx3_deps crlibm-fortran;
