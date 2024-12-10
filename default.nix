@@ -4,7 +4,6 @@
   crmath ? true,
 }: let
   callPackage = pkgs.callPackage;
-  hdf5-fortran = pkgs.hdf5-fortran;
   python3 = pkgs.python3;
   gyre-0-versions = {
     gyre-52 = {
@@ -53,7 +52,7 @@
     else pkgs.lapack;
   lapack95 = callPackage ./lapack95.nix {inherit lapack;};
   odepack = callPackage ./odepack.nix {};
-  hdf5 = hdf5-fortran.overrideAttrs (finalAttrs: prevAttrs: {patches = (prevAttrs.patches or []) ++ [./hdf5.patch];});
+  fypp = callPackage ./fypp.nix { buildPythonPackage = python3.pkgs.buildPythonPackage; };
   python3-with-fypp = python3.override {
     packageOverrides = self: super: {fypp = callPackage ./fypp.nix {buildPythonPackage = super.buildPythonPackage;};};
   };
@@ -63,7 +62,6 @@ in
   builtins.mapAttrs (name: g:
     callPackage (import ./gyre-2.nix g) {
       inherit lapack lapack95 odepack crlibm-fortran;
-      hdf5-fortran = hdf5;
       python3 = python3-with-fypp;
       withCrlibm = crmath;
     })
@@ -71,14 +69,14 @@ in
   // builtins.mapAttrs (name: g:
     callPackage (import ./gyre-1.nix g) {
       inherit lapack lapack95 fpx3 fpx3_deps crlibm-fortran;
-      hdf5-fortran = hdf5;
       withCrlibm = crmath;
     })
   gyre-1-versions
   // builtins.mapAttrs (name: g:
     callPackage (import ./gyre-0.nix g) {
       inherit lapack lapack95 fpx3 fpx3_deps crlibm-fortran;
-      hdf5-fortran = hdf5;
       withCrlibm = crmath;
     })
-  gyre-0-versions
+  gyre-0-versions // {
+      inherit crlibm-fortran fypp lapack95 lapack;
+  }
