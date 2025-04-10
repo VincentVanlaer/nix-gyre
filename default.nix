@@ -38,6 +38,10 @@
       version = "7.2";
       hash = "sha256-k0DWLJiILaQ6ue5ny9uQCXGm4pUXb667Pa8LIK7Y4HU=";
     };
+    gyre-80 = {
+      version = "8.0";
+      hash = "sha256-h5S0FFZGMJ1mY8KpMhat+CbDRie2mHnu1T0IJokVkn4=";
+    };
   };
 
   crlibm = callPackage ./crlibm.nix {};
