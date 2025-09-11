@@ -1,8 +1,9 @@
-{
-  pkgs ? import <nixpkgs> {},
-  lapack-netlib ? true,
-  crmath ? true,
-}: let
+{ pkgs ? import <nixpkgs> { }
+, lapack-netlib ? true
+, crmath ? true
+,
+}:
+let
   callPackage = pkgs.callPackage;
   python3 = pkgs.python3;
   gyre-0-versions = {
@@ -44,43 +45,47 @@
     };
   };
 
-  crlibm = callPackage ./crlibm.nix {};
-  crlibm-fortran = callPackage ./crlibm-fortran.nix {inherit crlibm;};
+  crlibm = callPackage ./crlibm.nix { };
+  crlibm-fortran = callPackage ./crlibm-fortran.nix { inherit crlibm; };
   lapack =
     if lapack-netlib
     then
-      callPackage ./lapack.nix {
-        inherit crlibm-fortran;
-        withCrlibm = crmath;
-      }
+      callPackage ./lapack.nix
+        {
+          inherit crlibm-fortran;
+          withCrlibm = crmath;
+        }
     else pkgs.lapack;
-  lapack95 = callPackage ./lapack95.nix {inherit lapack;};
-  odepack = callPackage ./odepack.nix {};
+  lapack95 = callPackage ./lapack95.nix { inherit lapack; };
+  odepack = callPackage ./odepack.nix { };
   fypp = callPackage ./fypp.nix { buildPythonPackage = python3.pkgs.buildPythonPackage; };
   python3-with-fypp = python3.override {
-    packageOverrides = self: super: {fypp = callPackage ./fypp.nix {buildPythonPackage = super.buildPythonPackage;};};
+    packageOverrides = self: super: { fypp = callPackage ./fypp.nix { buildPythonPackage = super.buildPythonPackage; }; };
   };
-  fpx3 = callPackage ./fpx3.nix {};
-  fpx3_deps = callPackage ./fpx3_deps.nix {};
+  fpx3 = callPackage ./fpx3.nix { };
+  fpx3_deps = callPackage ./fpx3_deps.nix { };
 in
-  builtins.mapAttrs (name: g:
+builtins.mapAttrs
+  (name: g:
     callPackage (import ./gyre-2.nix g) {
       inherit lapack lapack95 odepack crlibm-fortran;
       python3 = python3-with-fypp;
       withCrlibm = crmath;
     })
   gyre-2-versions
-  // builtins.mapAttrs (name: g:
+// builtins.mapAttrs
+  (name: g:
     callPackage (import ./gyre-1.nix g) {
       inherit lapack lapack95 fpx3 fpx3_deps crlibm-fortran;
       withCrlibm = crmath;
     })
   gyre-1-versions
-  // builtins.mapAttrs (name: g:
+// builtins.mapAttrs
+  (name: g:
     callPackage (import ./gyre-0.nix g) {
       inherit lapack lapack95 fpx3 fpx3_deps crlibm-fortran;
       withCrlibm = crmath;
     })
   gyre-0-versions // {
-      inherit crlibm-fortran fypp lapack95 lapack;
-  }
+  inherit crlibm-fortran fypp lapack95 lapack;
+}
