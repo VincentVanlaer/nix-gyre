@@ -43,6 +43,10 @@ let
       version = "8.0";
       hash = "sha256-h5S0FFZGMJ1mY8KpMhat+CbDRie2mHnu1T0IJokVkn4=";
     };
+    gyre-81 = {
+      version = "8.1";
+      hash = "sha256-MBSqekPf4sTLN6LwfDGwApCVAp2dhAAJOxyTKz5WMZ0=";
+    };
   };
 
   crlibm = callPackage ./crlibm.nix { };
