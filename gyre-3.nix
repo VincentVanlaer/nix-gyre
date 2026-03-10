@@ -13,7 +13,7 @@
   lapack95,
   odepack,
   autoPatchelfHook,
-  pkg-config,
+  pkgconf,
   crlibm-fortran,
   withCrlibm ? true,
 }:
@@ -21,14 +21,6 @@ let
   python = python3.withPackages (p: [ p.fypp ]);
   helpers = import ./helpers.nix { inherit lib; };
   makeFiles = "src/tide/Makefile src/forum/build/Make.inc src/forum/build/Makefile src/mesa/Makefile src/math/unit/Makefile src/interp/Makefile build/Make.inc build/Makefile";
-  linkProgs = {
-    "hdf5_link" = "pkg-config --libs hdf5_fortran";
-    "lapack_link" = "pkg-config --libs lapack";
-    "lapack95_link" = "pkg-config --libs lapack95";
-    "odepack_link" = "pkg-config --libs odepack";
-    "crlibm_link" = "pkg-config --libs crmath";
-    "crmath_link" = "pkg-config --libs crmath";
-  };
 in
 stdenv.mkDerivation {
   inherit version;
@@ -53,7 +45,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     autoPatchelfHook
     gfortran
-    pkg-config
+    pkgconf
   ];
   buildInputs = [
     hdf5-fortran
@@ -64,8 +56,6 @@ stdenv.mkDerivation {
   ++ lib.optional withCrlibm crlibm-fortran;
 
   configurePhase = ''
-    ${helpers.patchLinkProgs makeFiles linkProgs}
-    sed -i "s|FFLAGS =|FFLAGS +=|" build/Makefile
     sed -i "s|#!/usr/bin/env python3|#!${python}/bin/python3|" src/forum/build/fypp_deps build/fypp_deps
     sed -i "s|^sys.path.insert|#sys.path.insert|" src/forum/build/fypp_deps build/fypp_deps
     echo "echo passed" > build/check_sdk_version
